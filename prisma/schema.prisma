@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ColumnName {
+  DID
+  WILL
+  ACHIEVE
+  REGRET
+}
+
+model Entries {
+  id        Int        @id @default(autoincrement())
+  userId    String
+  entry     String
+  column    ColumnName
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([userId])
+}
