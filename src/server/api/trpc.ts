@@ -6,12 +6,12 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
-import { ZodError } from "zod";
+import { initTRPC, TRPCError } from '@trpc/server';
+import superjson from 'superjson';
+import { ZodError } from 'zod';
 
-import { db } from "@/server/db";
-import { auth } from "@clerk/nextjs/server";
+import { db } from '@/server/db';
+import { auth } from '@clerk/nextjs/server';
 
 /**
  * 1. CONTEXT
@@ -26,11 +26,11 @@ import { auth } from "@clerk/nextjs/server";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const { userId } = await auth();
+  const session = await auth();
   return {
     db,
     ...opts,
-    userId,
+    session,
   };
 };
 
@@ -100,13 +100,15 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 });
 
 const authMiddleware = t.middleware(async (opts) => {
-  const { userId } = opts.ctx;
+  const { userId } = opts.ctx.session;
   if (userId == null) {
     throw new TRPCError({
-      code: "UNAUTHORIZED",
+      code: 'UNAUTHORIZED',
     });
   }
-  return opts.next({ ctx: { ...opts.ctx, userId } });
+  return opts.next({
+    ctx: { ...opts.ctx, session: { ...opts.ctx.session, userId } },
+  });
 });
 
 /**
