@@ -1,10 +1,9 @@
-import EntryForm from '@/components/entryForm';
-import React from 'react';
+import { CommandMenu } from '@/components/commandMenu';
 
 const Page = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <EntryForm column='DID' />
+    <div className="flex min-h-[calc(100vh-100px)] items-center justify-center p-12">
+      <CommandMenu />
     </div>
   );
 };

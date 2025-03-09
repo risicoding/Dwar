@@ -14,9 +14,13 @@ export const entriesRouter = createTRPCRouter({
         return { res };
       } catch (err) {
         if (err instanceof Error)
-          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: err.message,
+          });
       }
     }),
+
   fetchByJournalId: privateProcedure
     .input(z.object({ journalId: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -27,17 +31,36 @@ export const entriesRouter = createTRPCRouter({
 
         return { res };
       } catch (err) {
-        if (err instanceof Error) throw new TRPCError({ code: 'NOT_FOUND' });
+        if (err instanceof Error)
+          throw new TRPCError({ code: 'NOT_FOUND', message: err.message });
       }
     }),
+
   fetchAll: privateProcedure.query(async ({ ctx }) => {
     try {
       const res = await ctx.db.entries.findMany({
         where: { userId: ctx.session.userId },
       });
+
       return { res };
     } catch (err) {
-      if (err instanceof Error) throw new TRPCError({ code: 'NOT_FOUND' });
+      if (err instanceof Error)
+        throw new TRPCError({ code: 'NOT_FOUND', message: err.message });
     }
   }),
+
+  delete: privateProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const res = await ctx.db.entries.delete({
+          where: { id: input.id, userId: ctx.session.userId },
+        });
+
+        return { res };
+      } catch (err) {
+        if (err instanceof Error)
+          throw new TRPCError({ code: 'NOT_FOUND', message: err.message });
+      }
+    }),
 });

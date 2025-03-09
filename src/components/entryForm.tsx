@@ -2,7 +2,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel } from './ui/form';
+import { Form, FormControl, FormField, FormItem } from './ui/form';
 import { Input } from './ui/input';
 import { api } from '@/trpc/react';
 import { Button } from './ui/button';
@@ -28,7 +28,6 @@ const EntryForm = ({
   });
 
   const onSubmit = async (data: z.infer<typeof entryFormSchema>) => {
-    await mutateAsync(data);
     console.log(data);
   };
 
